@@ -14,7 +14,8 @@ This is a simple, responsive calculator built using **HTML**, **CSS**, and **Jav
 
 ## 💻 Demo
 
-[👉 Try it Live (GitHub Pages)](https://Adams041.github.io/calculator/)
+[👉 Try it Live](https://adams041.github.io/simple-calc/)
+
 
 ## 🧠 How It Works
 
