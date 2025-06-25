@@ -3,150 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple Calculator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #f0f0f0;
-    }
-    .calculator {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      width: 260px;
-    }
-    .display {
-      background: #222;
-      color: #fff;
-      font-size: 2rem;
-      padding: 10px;
-      text-align: right;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      height: 50px;
-      overflow-x: auto;
-    }
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-    button {
-      padding: 20px;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 8px;
-      background-color: #e0e0e0;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background-color: #ccc;
-    }
-    .operator {
-      background-color: #f9a825;
-      color: white;
-    }
-    .equals {
-      background-color: #43a047;
-      color: white;
-      grid-column: span 2;
-    }
-    .clear {
-      background-color: #e53935;
-      color: white;
-      grid-column: span 2;
-    }
-    .backspace {
-      background-color: #607d8b;
-      color: white;
-    }
-  </style>
+  <title>SimpleCalc</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="calculator">
-    <div class="display" id="display">0</div>
-    <div class="buttons">
-      <button class="clear" id="clear">C</button>
-      <button class="backspace" id="backspace">⌫</button>
-      <button class="operator">/</button>
-      <button class="operator">*</button>
-      <button>7</button>
-      <button>8</button>
-      <button>9</button>
-      <button class="operator">-</button>
-      <button>4</button>
-      <button>5</button>
-      <button>6</button>
-      <button class="operator">+</button>
-      <button>1</button>
-      <button>2</button>
-      <button>3</button>
-      <button class="equals" id="equals">=</button>
-      <button>0</button>
-      <button>.</button>
+  <div class="calculator-wrapper">
+    <div class="toggle-controls">
+      <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+      <button onclick="toggleScientificMode()">Toggle Scientific Mode</button>
     </div>
+    <h1 class="title">SimpleCalc</h1>
+    <input type="text" id="display" disabled />
+    <div class="button-grid" id="buttons">
+      <button onclick="append('7')">7</button>
+      <button onclick="append('8')">8</button>
+      <button onclick="append('9')">9</button>
+      <button onclick="append('/')">/</button>
+      <button onclick="append('%')">%</button>
+
+      <button onclick="append('4')">4</button>
+      <button onclick="append('5')">5</button>
+      <button onclick="append('6')">6</button>
+      <button onclick="append('*')">*</button>
+      <button onclick="append('**')" class="sci-only">^</button>
+
+      <button onclick="append('1')">1</button>
+      <button onclick="append('2')">2</button>
+      <button onclick="append('3')">3</button>
+      <button onclick="append('-')">-</button>
+      <button onclick="append('Math.sqrt(')" class="sci-only">√</button>
+
+      <button onclick="append('0')">0</button>
+      <button onclick="append('.')">.</button>
+      <button onclick="clearDisplay()">C</button>
+      <button onclick="append('+')">+</button>
+      <button onclick="append('Math.PI')" class="sci-only">π</button>
+
+      <button onclick="append('Math.sin(')" class="sci-only">sin</button>
+      <button onclick="append('Math.cos(')" class="sci-only">cos</button>
+      <button onclick="append('Math.tan(')" class="sci-only">tan</button>
+      <button onclick="append('Math.log(')" class="sci-only">log</button>
+      <button onclick="append('Math.exp(')" class="sci-only">exp</button>
+
+      <button onclick="calculate()" style="grid-column: span 5; background-color: #4CAF50; color: white;">=</button>
+    </div>
+    <div class="history" id="history"></div>
   </div>
-<script>
-const display = document.getElementById("display");
-const clearBtn = document.getElementById("clear");
-const equalsBtn = document.getElementById("equals");
-const backspaceBtn = document.getElementById("backspace");
-const buttons = document.querySelectorAll(".buttons button");
-
-let justEvaluated = false;
-
-buttons.forEach(button => {
-  button.addEventListener("click", () => {
-    const value = button.textContent;
-
-    if (value === "=" || value === "C" || value === "⌫") return;
-
-    const isOperator = ["+", "-", "*", "/"].includes(value);
-
-    if (display.textContent === "Error" || (justEvaluated && !isOperator)) {
-      display.textContent = value;
-    } else if (display.textContent === "0") {
-      display.textContent = value;
-    } else {
-      display.textContent += value;
-    }
-
-    justEvaluated = false;
-  });
-});
-
-clearBtn.addEventListener("click", () => {
-  display.textContent = "0";
-  justEvaluated = false;
-});
-
-backspaceBtn.addEventListener("click", () => {
-  if (display.textContent === "Error" || justEvaluated) {
-    display.textContent = "0";
-  } else if (display.textContent.length === 1) {
-    display.textContent = "0";
-  } else {
-    display.textContent = display.textContent.slice(0, -1);
-  }
-  justEvaluated = false;
-});
-
-equalsBtn.addEventListener("click", () => {
-  try {
-    const result = eval(display.textContent);
-    display.textContent = result;
-    justEvaluated = true;
-  } catch (err) {
-    display.textContent = "Error";
-    justEvaluated = false;
-  }
-});
-</script>
+  <script src="index.js"></script>
 </body>
 </html>
