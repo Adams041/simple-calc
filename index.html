@@ -4,52 +4,87 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SimpleCalc</title>
+  <link rel="icon" href="https://img.icons8.com/ios-filled/50/000000/calculator.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="calculator-wrapper">
-    <div class="toggle-controls">
-      <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-      <button onclick="toggleScientificMode()">Toggle Scientific Mode</button>
-    </div>
     <h1 class="title">SimpleCalc</h1>
-    <input type="text" id="display" disabled />
-    <div class="button-grid" id="buttons">
-      <button onclick="append('7')">7</button>
-      <button onclick="append('8')">8</button>
-      <button onclick="append('9')">9</button>
-      <button onclick="append('/')">/</button>
-      <button onclick="append('%')">%</button>
-
-      <button onclick="append('4')">4</button>
-      <button onclick="append('5')">5</button>
-      <button onclick="append('6')">6</button>
-      <button onclick="append('*')">*</button>
-      <button onclick="append('**')" class="sci-only">^</button>
-
-      <button onclick="append('1')">1</button>
-      <button onclick="append('2')">2</button>
-      <button onclick="append('3')">3</button>
-      <button onclick="append('-')">-</button>
-      <button onclick="append('Math.sqrt(')" class="sci-only">√</button>
-
-      <button onclick="append('0')">0</button>
-      <button onclick="append('.')">.</button>
-      <button onclick="clearDisplay()">C</button>
-      <button onclick="append('+')">+</button>
-      <button onclick="append('Math.PI')" class="sci-only">π</button>
-
-      <button onclick="append('Math.sin(')" class="sci-only">sin</button>
-      <button onclick="append('Math.cos(')" class="sci-only">cos</button>
-      <button onclick="append('Math.tan(')" class="sci-only">tan</button>
-      <button onclick="append('Math.log(')" class="sci-only">log</button>
-      <button onclick="append('Math.exp(')" class="sci-only">exp</button>
-
-      <button onclick="calculate()" style="grid-column: span 5; background-color: #4CAF50; color: white;">=</button>
+    <div class="toggle-controls">
+      <button onclick="toggleDarkMode()">🌙</button>
+      <button onclick="toggleScientificMode()">🔬</button>
     </div>
-    <div class="history" id="history"></div>
+    <div class="calc-layout">
+      <div class="main-calc">
+        <input type="text" id="display" disabled />
+        <div class="button-grid">
+          <button class="calc-btn" onclick="onBtn('7')">7</button>
+          <button class="calc-btn" onclick="onBtn('8')">8</button>
+          <button class="calc-btn" onclick="onBtn('9')">9</button>
+          <button class="calc-btn" onclick="onBtn('/')">/</button>
+
+          <button class="calc-btn" onclick="onBtn('4')">4</button>
+          <button class="calc-btn" onclick="onBtn('5')">5</button>
+          <button class="calc-btn" onclick="onBtn('6')">6</button>
+          <button class="calc-btn" onclick="onBtn('*')">*</button>
+
+          <button class="calc-btn" onclick="onBtn('1')">1</button>
+          <button class="calc-btn" onclick="onBtn('2')">2</button>
+          <button class="calc-btn" onclick="onBtn('3')">3</button>
+          <button class="calc-btn" onclick="onBtn('-')">-</button>
+
+          <button class="calc-btn" onclick="onBtn('0')">0</button>
+          <button class="calc-btn" onclick="onBtn('.')">.</button>
+          <button class="calc-btn" onclick="clearDisplay()">C</button>
+          <button class="calc-btn" onclick="backspace()">⌫</button>
+
+          <button class="calc-btn sci-only" onclick="onBtn('Math.sqrt(')">√</button>
+          <button class="calc-btn sci-only" onclick="onBtn('Math.sin(')">sin</button>
+          <button class="calc-btn sci-only" onclick="onBtn('Math.cos(')">cos</button>
+          <button class="calc-btn sci-only" onclick="onBtn('Math.log(')">log</button>
+
+          <button class="calc-btn equals-button" onclick="calculate()">=</button>
+        </div>
+      </div>
+      <div class="history" id="history"></div>
+    </div>
   </div>
-  <script src="index.js"></script>
+  <script>
+    const display = document.getElementById('display');
+    const historyEl = document.getElementById('history');
+    const calcWrapper = document.querySelector('.calculator-wrapper');
+    let expressions = [];
+    let fresh = false;
+
+    function onBtn(val) {
+      if (fresh && /[0-9.]/.test(val)) { display.value = ''; fresh = false; }
+      display.value += val;
+    }
+    function clearDisplay() { display.value = ''; }
+    function backspace() { display.value = display.value.slice(0,-1); }
+    function calculate() {
+      try {
+        const exp = display.value;
+        const res = eval(exp);
+        display.value = res;
+        fresh = true;
+        expressions.unshift(`${exp}=${res}`);
+        if (expressions.length>5) expressions.pop();
+        renderHistory();
+      } catch { display.value = 'Error'; }
+    }
+    function renderHistory() {
+      historyEl.innerHTML = expressions.map(e=>`<div>${e}</div>`).join('');
+    }
+    function toggleDarkMode() { document.body.classList.toggle('dark'); }
+    function toggleScientificMode() { calcWrapper.classList.toggle('scientific'); }
+    document.addEventListener('keydown', e=>{
+      if (/^[0-9.+\-*/]$/.test(e.key)) onBtn(e.key);
+      else if (e.key==='Enter') { e.preventDefault(); calculate(); }
+      else if (e.key==='Backspace') backspace();
+      else if (e.key.toLowerCase()==='c') clearDisplay();
+    });
+  </script>
 </body>
 </html>
