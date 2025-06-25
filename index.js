@@ -1,47 +1,77 @@
- let display = document.getElementById('display');
-    let history = document.getElementById('history');
-    let expressions = [];
+// index.js for SimpleCalc
 
-    function append(char) {
-      display.value += char;
+const display = document.getElementById('display');
+const historyEl = document.getElementById('history');
+const calcWrapper = document.querySelector('.calculator-wrapper');
+let expressions = [];
+let fresh = false;
+
+// Handle button presses
+function onBtn(val) {
+  // Auto-clear if starting a new number after result
+  if (fresh && /[0-9.]/.test(val)) {
+    display.value = '';
+    fresh = false;
+  }
+  display.value += val;
+}
+
+// Clear display completely
+function clearDisplay() {
+  display.value = '';
+}
+
+// Remove last character
+function backspace() {
+  display.value = display.value.slice(0, -1);
+}
+
+// Evaluate expression and update history
+function calculate() {
+  try {
+    const exp = display.value;
+    const res = eval(exp);
+    display.value = res;
+    fresh = true;
+
+    // Store to history
+    expressions.unshift(`${exp} = ${res}`);
+    if (expressions.length > 5) {
+      expressions.pop();
     }
+    renderHistory();
+  } catch {
+    display.value = 'Error';
+    fresh = true;
+  }
+}
 
-    function clearDisplay() {
-      display.value = '';
-    }
+// Render the history side panel
+function renderHistory() {
+  historyEl.innerHTML = expressions.map(e => `<div>${e}</div>`).join('');
+}
 
-    function calculate() {
-      try {
-        const expression = display.value;
-        const result = eval(expression);
-        display.value = result;
-        expressions.unshift(`${expression} = ${result}`);
-        if (expressions.length > 5) expressions.pop();
-        updateHistory();
-      } catch (e) {
-        display.value = 'Error';
-      }
-    }
+// Toggle dark mode on body
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+}
 
-    function updateHistory() {
-      history.innerHTML = expressions.map(exp => `<div>${exp}</div>`).join('');
-    }
+// Toggle scientific buttons
+function toggleScientificMode() {
+  calcWrapper.classList.toggle('scientific');
+}
 
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark');
-    }
-
-    // Keyboard support
-    document.addEventListener('keydown', (event) => {
-      const key = event.key;
-      if ((/\d|\.|\+|\-|\*|\/|%/).test(key)) {
-        append(key);
-      } else if (key === 'Enter') {
-        event.preventDefault();
-        calculate();
-      } else if (key === 'Backspace') {
-        display.value = display.value.slice(0, -1);
-      } else if (key.toLowerCase() === 'c') {
-        clearDisplay();
-      }
-    });
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  const key = e.key;
+  if (/^[0-9.+\-*/]$/.test(key)) {
+    onBtn(key);
+  } else if (key === 'Enter') {
+    e.preventDefault();
+    calculate();
+  } else if (key === 'Backspace') {
+    backspace();
+  } else if (key.toLowerCase() === 'c') {
+    clearDisplay();
+  }
+});
